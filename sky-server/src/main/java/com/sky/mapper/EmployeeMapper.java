@@ -32,4 +32,18 @@ public interface EmployeeMapper {
     @AutoFill(value = OperationType.INSERT)
     void insert(Employee employee);
 
+
+    /**
+     * 分页查询
+     * @param employeePageQueryDTO
+     * @return
+     */
+    Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+
+    /**
+     * 启用禁用员工账号
+     * @param employee
+     */
+    void update(Employee employee);
 }
