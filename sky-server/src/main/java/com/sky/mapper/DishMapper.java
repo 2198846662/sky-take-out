@@ -95,4 +95,11 @@ public interface DishMapper {
      */
     void deleteByIds(List<Long> ids);
 
+
+    /**
+     * 批量查询
+     * @param ids
+     * @return
+     */
+    List<Dish> getByIds(List<Long> ids);
 }

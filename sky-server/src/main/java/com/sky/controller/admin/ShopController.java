@@ -1,5 +1,6 @@
 package com.sky.controller.admin;
 
+import com.sky.entity.Dish;
 import com.sky.result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,26 +27,23 @@ public class ShopController {
      */
     @PutMapping("/{status}")
     @ApiOperation("设置店铺的营业状态")
-    public Result setStatus(@PathVariable Integer status){
-        log.info("设置店铺的营业状态为：{}",status == 1 ? "营业中" : "打烊中");
+    public Result setStatus(@PathVariable Integer status) {
+        log.info("设置店铺的营业状态: {}",status == 1 ? "营业中" : "打烊中");
         redisTemplate.opsForValue().set(KEY,status);
         return Result.success();
     }
 
+
     /**
-     * 获取店铺的营业状态
+     * 查询营业状态
      * @return
      */
     @GetMapping("/status")
-    @ApiOperation("获取店铺的营业状态")
-    public Result<Integer> getStatus(){
-        Integer status = (Integer) redisTemplate.opsForValue().get(KEY);
-        log.info("获取到店铺的营业状态为：{}",status == 1 ? "营业中" : "打烊中");
+    @ApiOperation("查询营业状态")
+    public Result<Integer> getStatus() {
+        Integer status = (Integer)redisTemplate.opsForValue().get(KEY);
+        log.info("查询营业状态：{}", status == 1 ? "营业中" : "打烊中");
         return Result.success(status);
-//        String status = (String) redisTemplate.opsForValue().get(KEY);
-//        // 将String转换回Integer
-//        Integer statusValue = status != null ? Integer.valueOf(status) : null;
-//        return Result.success(statusValue);
-
     }
+
 }
