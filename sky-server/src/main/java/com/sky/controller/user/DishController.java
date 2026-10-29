@@ -25,6 +25,7 @@ public class DishController {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
     /**
      * 根据分类id查询菜品
      *
@@ -44,27 +45,26 @@ public class DishController {
 //    }
 
     public Result<List<DishVO>> list(Long categoryId) {
-//        //1.构造redis中的key，规则：dish_分类id
-//        String key = "dish_" + categoryId;
-//
-//        //2.查询redis中是否存在菜品数据 （放进去什么类型就用什么类型取出来）
-//        List<DishVO> list = (List<DishVO>) redisTemplate.opsForValue().get(key);
-//        if(list != null && list.size() > 0){
-//            //3.如果存在，直接返回，无须查询数据库
-//            return Result.success(list);
-//        }
-//
-//
-//        //4.如果不存在，查询数据库，将查询到的数据放入redis中
-//        Dish dish = new Dish();
-//        dish.setCategoryId(categoryId);
-//        dish.setStatus(StatusConstant.ENABLE);//查询起售中的菜品
-//
-//        list = dishService.listWithFlavor(dish);
-//        redisTemplate.opsForValue().set(key, list);
+        //构造redis中的key，规则：dish_分类id
+        String key = "dish_" + categoryId;
 
-//        return Result.success(list);
-        return null;
+        //查询redis中是否存在菜品数据 （放进去什么类型就用什么类型取出来）
+        List<DishVO> list = (List<DishVO>) redisTemplate.opsForValue().get(key);
+        //判断传回来的list里是否有数据
+        if (list != null && list.size() > 0) {
+            return  Result.success(list);
+        }
+        //4.如果不存在，查询数据库，将查询到的数据放入redis中
+        Dish dish = new Dish();
+        dish.setCategoryId(categoryId);
+        dish.setStatus(StatusConstant.ENABLE);//查询起售中的菜品
+
+        list = dishService.listWithFlavor(dish);
+        //保存到redis中
+        redisTemplate.opsForValue().set(key, list);
+
+        return Result.success(list);
+
     }
 
 }

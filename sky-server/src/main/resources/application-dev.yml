@@ -17,8 +17,8 @@ sky:
     port: 6379
     database: 1
   wechat:
-    app-id:             # 你的微笑小程序appid
-    app-secret:       # 你的微笑小程序sercret key
+    app-id: wx378ce3d907f97101            # 你的微笑小程序appid
+    app-secret: cf1a3a733010c8e6eb4f55239a013939     # 你的微笑小程序sercret key
 #    mchid: 1561414331 #传智播客申请的商户号
 #    mchSerialNo: 4B3B3DC35414AD50B1B755BAF8DE9CC7CF407606 #证书的序列号
 #    privateKeyFilePath: D:\apiclient_key.pem #私钥文件（不是企业 没有）

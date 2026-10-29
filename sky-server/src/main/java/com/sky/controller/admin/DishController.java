@@ -2,6 +2,7 @@ package com.sky.controller.admin;
 
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -14,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 菜品管理
@@ -39,6 +41,10 @@ public class DishController {
     public Result save(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品：{}", dishDTO);
         dishService.saveWithFlavor(dishDTO);
+
+        //清理缓存数据
+        String key = "dish_" + dishDTO.getCategoryId();
+        redisTemplate.delete(key);
         return Result.success();
     }
 
@@ -65,6 +71,10 @@ public class DishController {
     public Result delete(@RequestParam List<Long> ids) {
         log.info("菜品批量删除:{}",ids);
         dishService.deleteBatch(ids);
+
+        //将所有的菜品缓存数据清理掉，所有以dish_开头的key(比较粗暴的做法，当然也可以去挨个查对应的CategoryId)
+        Set keys = redisTemplate.keys("dish_*");//获取redis中所有以dish_开头的key
+        redisTemplate.delete(keys);
         return Result.success();
     }
 
@@ -91,6 +101,42 @@ public class DishController {
     public Result updater(@RequestBody DishDTO dishDTO) {
         log.info("修改菜品:{}",dishDTO);
         dishService.updateWithFlavor(dishDTO);
+
+        //将所有的菜品缓存数据清理掉，所有以dish_开头的key(比较粗暴的做法，因为假如修改菜品分类还有去查影响了哪个分类，也要一同清理)
+        Set keys = redisTemplate.keys("dish_*");//获取redis中所有以dish_开头的key
+        redisTemplate.delete(keys);
+
         return Result.success();
     }
+
+    /**
+     * 菜品的启用、禁用分类
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用禁用分类")
+    public Result<String> startOrStop(@PathVariable("status") Integer status, Long id){
+        dishService.startOrStop(status,id);
+
+        //将所有的菜品缓存数据清理掉
+        Set keys = redisTemplate.keys("dish_*");
+        redisTemplate.delete(keys);
+
+        return Result.success();
+    }
+
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
+    @GetMapping("/list")
+    @ApiOperation("根据分类id查询菜品")
+    public Result<List<Dish>> list(Long categoryId) {
+        List<Dish> list = dishService.list(categoryId);
+        return Result.success(list);
+    }
+
 }
